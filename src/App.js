@@ -3,10 +3,10 @@ import { supabase } from './supabaseclient';
 import './App.css';
 
 function App() {
-  // State to hold list of todos that are fetched from supabase db
-  const [todos, setTodos] = useState([]);
-  // State to hold new todos being added
-  const [newTodo, setNewtodo] = useState('');
+  const [todos, setTodos] = useState([]); // State to hold list of todos that are fetched from supabase db
+  const [newTodo, setNewtodo] = useState(''); // State to hold new todos being added
+  const [editId, setEditId] = useState(null); // State holding the ID of todo item being edited. Lets us make sure we're editing the correct item
+  const [editTitle, setEditTitle] = useState(''); // State to hold title of todo being edited
 
   // fetch todos whenever component is mounted
   useEffect(() => {
@@ -44,7 +44,27 @@ function App() {
       }
   };
 
-  // Remove a task
+  // Update the todo being edited 
+  const updateTodo = async(id, editedTitle) => {
+    const {data, error} = await supabase
+      .from('todos')
+      .update({'title': editedTitle})
+      .eq('id', id)
+      .select()
+
+    if (error) {
+      console.log(error);
+    } else {
+      setTodos(prevTodos =>
+        prevTodos.map(todo =>
+          todo.id === id ? { ...todo, title: editedTitle } : todo
+        )
+      );
+      setEditId(null); // Exit edit mode after saving
+    }
+  }
+
+  // Remove a todo from list and supabase table
   const removeTodo = async(id) => {
     const {error} = await supabase
       .from('todos')
@@ -75,8 +95,26 @@ function App() {
         {/* Get all todos from the state and list them */}
         {todos.map(todo => (
           <li key={todo.id}>
-            <span>{todo.title}</span>
-            <button onClick={() => removeTodo(todo.id)}>Remove</button>
+            {/* If the todo is being edited, render as an input. Otherwise render as a view item */}
+            {editId === todo.id ? (
+              <>
+                <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onBlur={() => updateTodo(todo.id, editTitle)} // Save on blur (clicking outside the input)
+                autoFocus // Automatically focus on the input field
+                />
+                <button onClick={() => updateTodo(todo.id, editTitle)}>Save</button>
+                <button onClick={() => setEditId(null)}>Cancel</button>
+              </>
+            ) : (
+              <>
+                <span>{todo.title}</span>
+                <button onClick={() => {setEditId(todo.id); setEditTitle(todo.title)}}>Edit</button>
+                <button onClick={() => removeTodo(todo.id)}>Remove</button>
+              </>
+            )}
           </li>
         ))}
       </ul>
