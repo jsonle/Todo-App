@@ -8,38 +8,49 @@ function App() {
   // State to hold new todos being added
   const [newTodo, setNewtodo] = useState('');
 
+  // fetch todos whenever component is mounted
   useEffect(() => {
     fetchTodos();
   }, [])
 
   // Fetch todos from supabase 'todos' table
   const fetchTodos = async() => {
-    let { data: todos, error } = await supabase
+    let {data: todos, error} = await supabase
       .from('todos')
       .select('*'); // Select all columns
 
     if (error) {
-      console.log(error);
+      console.log(error); // Log the error if there is one
     } else {
-      setTodos(todos);
+      setTodos(todos); // Update state with set todos
     }
+
+  // Add a new todo to the 'todos' table in supabase
+  const addTodo = async() => {
+    const {data, error} = await supabase
+      .from('todos')
+      .insert([{title: newTodo, is_complete: false}]) // Insert into table with completion status defaulted to false
+      .single(); // Return a single row
+
+    if (error) {
+      console.log(error); // Log the error if there is one
+    } else {
+      setTodos([...todos, data]) // Add the new todo to the current state of todos
+      setNewtodo('') // Reset the new todo input after adding
+    }
+  }
   };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>To Do List</h1>
+      <input type="text" value={newTodo} onChange={(e) => setNewtodo(e.target.value)} placeholder="Add a new task"/>
+      <button onClick={addTodo}>Add</button>
+      <ul>
+        {/* Get all todos from the state and list them */}
+        {todos.map(todo => (
+          <li key={todo.id}>{todo.title}</li>
+        ))}
+      </ul>
     </div>
   );
 }
