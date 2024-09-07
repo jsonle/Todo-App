@@ -24,26 +24,40 @@ function App() {
     } else {
       setTodos(todos); // Update state with set todos
     }
-
+  };
   // Add a new todo to the 'todos' table in supabase
   const addTodo = async() => {
     const {data, error} = await supabase
       .from('todos')
       .insert([{title: newTodo, is_complete: false}]) // Insert into table with completion status defaulted to false
-      .single(); // Return a single row
+      .select()
 
-    if (error) {
-      console.log(error); // Log the error if there is one
-    } else {
-      setTodos([...todos, data]) // Add the new todo to the current state of todos
-      setNewtodo('') // Reset the new todo input after adding
-    }
-  }
+      if (error) {
+        console.log('Error:', error);
+      } else {
+        // Ensure `data` contains the correct structure
+        console.log('New Todo Added:', data);
+    
+        // Update state with the new todo
+        setTodos(prevTodos => [...prevTodos, ...data]);
+    
+        // Clear the input field
+        setNewtodo('');
+      }
   };
+
   return (
     <div className="App">
       <h1>To Do List</h1>
-      <input type="text" value={newTodo} onChange={(e) => setNewtodo(e.target.value)} placeholder="Add a new task"/>
+      <input 
+        type="text" 
+        value={newTodo} 
+        onChange={(e) => {
+          console.log(e.target.value);
+          setNewtodo(e.target.value);
+        }}
+        placeholder="Add a new task"
+        />
       <button onClick={addTodo}>Add</button>
       <ul>
         {/* Get all todos from the state and list them */}
