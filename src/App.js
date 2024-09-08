@@ -64,6 +64,24 @@ function App() {
     }
   }
 
+  // Handler for toggling whether a task is complete/incomplete
+  const toggleComplete = async(id, completeStatus) => {
+    const {error} = await supabase
+      .from('todos')
+      .update({'is_complete': !completeStatus})
+      .eq('id', id)
+
+      if (error) {
+        console.log(error);
+      } else {
+        setTodos(prevTodos => 
+          prevTodos.map(todo => 
+            todo.id === id ? {...todo, is_complete: !completeStatus} : todo
+          )
+        )
+      }
+  }
+
   // Remove a todo from list and supabase table
   const removeTodo = async(id) => {
     const {error} = await supabase
@@ -99,17 +117,29 @@ function App() {
             {editId === todo.id ? (
               <>
                 <input
-                type="text"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                onBlur={() => updateTodo(todo.id, editTitle)} // Save on blur (clicking outside the input)
-                autoFocus // Automatically focus on the input field
+                  type="checkbox"
+                  checked={todo.is_complete}
+                  onChange={() => toggleComplete(todo.id, todo.is_complete)}
+                  title="Mark as complete/incomplete" // Tooltip for the checkbox
+                />
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  onBlur={() => updateTodo(todo.id, editTitle)} // Save on blur (clicking outside the input)
+                  autoFocus // Automatically focus on the input field
                 />
                 <button onClick={() => updateTodo(todo.id, editTitle)}>Save</button>
                 <button onClick={() => setEditId(null)}>Cancel</button>
               </>
             ) : (
               <>
+                <input
+                  type="checkbox"
+                  checked={todo.complete}
+                  onChange={() => toggleComplete(todo.id, todo.is_complete)}
+                  title="Mark as complete/incomplete" // Tooltip for the checkbox
+                />
                 <span>{todo.title}</span>
                 <button onClick={() => {setEditId(todo.id); setEditTitle(todo.title)}}>Edit</button>
                 <button onClick={() => removeTodo(todo.id)}>Remove</button>
