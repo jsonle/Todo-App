@@ -7,11 +7,14 @@ function App() {
   const [newTodo, setNewtodo] = useState(''); // State to hold new todos being added
   const [editId, setEditId] = useState(null); // State holding the ID of todo item being edited. Lets us make sure we're editing the correct item
   const [editTitle, setEditTitle] = useState(''); // State to hold title of todo being edited
+  const [showCompleted, setShowCompleted] = useState(true); // State for wanting to show or hide completed tasks
 
   // fetch todos whenever component is mounted
   useEffect(() => {
     fetchTodos();
   }, [])
+
+  const filteredTodos = todos.filter(todo => showCompleted || !todo.is_complete);
 
   // Fetch todos from supabase 'todos' table
   const fetchTodos = async() => {
@@ -100,6 +103,12 @@ function App() {
       }
   }
 
+  // Handler for toggling whether we want to show or hide completed tasks
+  const handleToggleChange = () => {
+    console.log(showCompleted)
+    setShowCompleted(!showCompleted);
+  };
+
   // Remove a todo from list and supabase table
   const removeTodo = async(id) => {
     const {error} = await supabase
@@ -125,40 +134,49 @@ function App() {
           setNewtodo(e.target.value);
         }}
         placeholder="Add a new task"
-        />
+      />
       <button onClick={addTodo}>Add</button>
-      <ul>
-        {/* Get all todos from the state and list them */}
-        {todos.map((todo, index) => (
+  
+      <div className="toggle-container">
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={showCompleted}
+            onChange={handleToggleChange}
+          />
+          <span className="slider"></span>
+        </label>
+        <span className="label-text">Show Completed</span>
+      </div>
+  
+      <ol>
+        {filteredTodos.map((todo, index) => (
           <li key={todo.id}>
-            {/* If the todo is being edited, render as an input. Otherwise render as a view item */}
             {editId === todo.id ? (
               <>
-                {index + 1}.
                 <input
                   type="checkbox"
                   checked={todo.is_complete}
                   onChange={() => toggleComplete(todo.id, todo.is_complete)}
-                  title="Mark as complete/incomplete" // Tooltip for the checkbox
+                  title="Mark as complete/incomplete"
                 />
                 <input
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  onBlur={() => updateTodo(todo.id, editTitle)} // Save on blur (clicking outside the input)
-                  autoFocus // Automatically focus on the input field
+                  onBlur={() => updateTodo(todo.id, editTitle)}
+                  autoFocus
                 />
                 <button onClick={() => updateTodo(todo.id, editTitle)}>Save</button>
                 <button onClick={() => setEditId(null)}>Cancel</button>
               </>
             ) : (
               <>
-                {index + 1}.
                 <input
                   type="checkbox"
-                  checked={todo.complete}
+                  checked={todo.is_complete}
                   onChange={() => toggleComplete(todo.id, todo.is_complete)}
-                  title="Mark as complete/incomplete" // Tooltip for the checkbox
+                  title="Mark as complete/incomplete"
                 />
                 <span>{todo.title}</span>
                 <button onClick={() => {setEditId(todo.id); setEditTitle(todo.title)}}>Edit</button>
@@ -167,9 +185,9 @@ function App() {
             )}
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
-  );
+  );  
 }
 
 export default App;
