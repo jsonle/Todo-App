@@ -3,7 +3,7 @@ import TodoInput from '../components/TodoInput';
 import TodoList from './TodoList';
 import ToggleSwitch from '../components/ToggleSwitch';
 import { Box, Container, Typography } from '@mui/material';
-import { supabase } from '../supabaseclient';
+import { supabase } from '../supabaseClient';
 
 const TodosContainer = () => {
   const [todos, setTodos] = useState([]); // State to hold list of todos that are fetched from supabase db
