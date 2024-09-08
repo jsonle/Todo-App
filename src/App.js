@@ -1,5 +1,19 @@
 import React, {useState, useEffect} from 'react';
 import { supabase } from './supabaseclient';
+import {
+  Container,
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Box,
+  Switch
+} from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material';
 import './App.css';
 
 function App() {
@@ -124,70 +138,71 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <h1>To Do List</h1>
-      <input 
-        type="text" 
-        value={newTodo} 
-        onChange={(e) => {
-          console.log(e.target.value);
-          setNewtodo(e.target.value);
-        }}
-        placeholder="Add a new task"
-      />
-      <button onClick={addTodo}>Add</button>
-  
-      <div className="toggle-container">
-        <label className="switch">
-          <input
-            type="checkbox"
-            checked={showCompleted}
-            onChange={handleToggleChange}
+    <Container maxWidth="sm">
+      <Box sx={{ padding: '20px' }}>
+        <h1>To Do List</h1>
+        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Add a new task"
+            value={newTodo}
+            onChange={(e) => setNewtodo(e.target.value)}
           />
-          <span className="slider"></span>
-        </label>
-        <span className="label-text">Show Completed</span>
-      </div>
-  
-      <ol>
-        {filteredTodos.map((todo, index) => (
-          <li key={todo.id}>
-            {editId === todo.id ? (
-              <>
-                <input
-                  type="checkbox"
-                  checked={todo.is_complete}
-                  onChange={() => toggleComplete(todo.id, todo.is_complete)}
-                  title="Mark as complete/incomplete"
-                />
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  onBlur={() => updateTodo(todo.id, editTitle)}
-                  autoFocus
-                />
-                <button onClick={() => updateTodo(todo.id, editTitle)}>Save</button>
-                <button onClick={() => setEditId(null)}>Cancel</button>
-              </>
-            ) : (
-              <>
-                <input
-                  type="checkbox"
-                  checked={todo.is_complete}
-                  onChange={() => toggleComplete(todo.id, todo.is_complete)}
-                  title="Mark as complete/incomplete"
-                />
-                <span>{todo.title}</span>
-                <button onClick={() => {setEditId(todo.id); setEditTitle(todo.title)}}>Edit</button>
-                <button onClick={() => removeTodo(todo.id)}>Remove</button>
-              </>
-            )}
-          </li>
-        ))}
-      </ol>
-    </div>
-  );  
+          <Button onClick={addTodo} variant="contained" sx={{ marginLeft: '10px' }}>
+            Add
+          </Button>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+          <Switch
+            checked={showCompleted}
+            onChange={(e) => setShowCompleted(e.target.checked)}
+            color="primary"
+          />
+          <span style={{ marginLeft: '10px' }}>Show Completed</span>
+        </Box>
+        <List>
+          {filteredTodos.map((todo) => (
+            <ListItem key={todo.id} disablePadding>
+              <Checkbox
+                checked={todo.is_complete}
+                onChange={() => toggleComplete(todo.id, todo.is_complete)}
+                sx={{ marginRight: '10px' }}
+              />
+              {editId === todo.id ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                  <TextField
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    onBlur={() => updateTodo(todo.id, editTitle)}
+                    autoFocus
+                    sx={{ flexGrow: 1 }}
+                  />
+                  <Button onClick={() => updateTodo(todo.id, editTitle)}>Save</Button>
+                  <Button onClick={() => setEditId(null)}>Cancel</Button>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                  <ListItemText
+                    primary={todo.title}
+                    sx={{ textDecoration: todo.is_complete ? 'line-through' : 'none' }}
+                  />
+                  <Box sx={{ marginLeft: 'auto' }}>
+                    <IconButton onClick={() => { setEditId(todo.id); setEditTitle(todo.title); }}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => removeTodo(todo.id)}>
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </Box>
+              )}
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    </Container>
+  );
 }
 
 export default App;
