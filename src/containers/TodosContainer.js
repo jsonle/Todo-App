@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TodoInput from '../components/TodoInput';
 import TodoList from './TodoList';
 import ToggleSwitch from '../components/ToggleSwitch';
-import { Box, Container } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { supabase } from '../supabaseclient';
 
 const TodosContainer = () => {
@@ -17,6 +17,7 @@ const TodosContainer = () => {
     fetchTodos();
   }, [])
 
+  // Handles filtering Todos by whether they are completed or not
   const filteredTodos = todos.filter(todo => showCompleted || !todo.is_complete);
 
   // Fetch todos from supabase 'todos' table
@@ -128,8 +129,10 @@ const TodosContainer = () => {
 
     return (
         <Container maxWidth="sm">
-        <Box textAlign="center" mb={4}>
-          <h1>To Do List</h1>
+        <Box textAlign="center" mb={{ xs: 2, sm: 4 }}>
+          <Typography sx={{marginBottom: '10px'}} variant="h4" component="h1" align="center">
+            To Do List
+          </Typography>
           <TodoInput newTodo={newTodo} setNewTodo={setNewTodo} addTodo={addTodo} />
           <ToggleSwitch showCompleted={showCompleted} handleToggleChange={handleToggleChange} />
           <TodoList

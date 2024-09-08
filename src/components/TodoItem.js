@@ -1,6 +1,6 @@
 import React from 'react';
-import { ListItem, Checkbox, IconButton, TextField, Box, ListItemText, Button } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
+import { ListItem, Checkbox, IconButton, TextField, Box, ListItemText, Button, TableCell, TableRow } from '@mui/material';
+import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 
 const TodoItem = ({
   todo,
@@ -12,34 +12,40 @@ const TodoItem = ({
   removeTodo,
   toggleComplete,
 }) => (
-  <ListItem>
-    <Checkbox
-      checked={todo.is_complete}
-      onChange={() => toggleComplete(todo.id, todo.is_complete)}
-      title="Mark as complete/incomplete"
-      sx={{marginRight: '10px'}}
-    />
-    {editId === todo.id ? (
-      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-        <TextField
-          variant="outlined"
+<TableRow key={todo.id}>
+    <TableCell align="center">
+      <Checkbox
+        checked={todo.is_complete}
+        onChange={() => toggleComplete(todo.id, todo.is_complete)}
+      />
+    </TableCell>
+    <TableCell align="left">
+      {editId === todo.id ? (
+        <input
+          type="text"
           value={editTitle}
           onChange={(e) => setEditTitle(e.target.value)}
-          onBlur={() => updateTodo(todo.id, editTitle)}
           autoFocus
         />
-        <Box sx={{marginLeft: 'auto'}}>
-            <Button onClick={() => updateTodo(todo.id, editTitle)}>Save</Button>
-            <Button onClick={() => setEditId(null)}>Cancel</Button>
+      ) : (
+        <span>{todo.title}</span>
+      )}
+    </TableCell>
+    <TableCell align="center">
+      {todo.is_complete ? 'Completed' : 'Incomplete'}
+    </TableCell>
+    <TableCell align="right">
+      {editId === todo.id ? (
+        <Box sx={{ display: 'flex'}}>
+          <IconButton onClick={() => { updateTodo(todo.id, editTitle); setEditId(null); }}>
+            <Save />
+          </IconButton>
+          <IconButton onClick={() => setEditId(null)}>
+            <Cancel />
+          </IconButton>
         </Box>
-      </Box>
-    ) : (
-    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-        <ListItemText
-          primary={todo.title}
-          sx={{ textDecoration: todo.is_complete ? 'line-through' : 'none' }}
-        />
-        <Box sx={{ marginLeft: 'auto' }}>
+      ) : (
+        <Box sx={{ display: 'flex'}}>
           <IconButton onClick={() => { setEditId(todo.id); setEditTitle(todo.title); }}>
             <Edit />
           </IconButton>
@@ -47,9 +53,9 @@ const TodoItem = ({
             <Delete />
           </IconButton>
         </Box>
-    </Box>
-    )}
-  </ListItem>
+      )}
+    </TableCell>
+  </TableRow>
 );
 
 export default TodoItem;
