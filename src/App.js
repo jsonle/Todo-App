@@ -17,7 +17,8 @@ function App() {
   const fetchTodos = async() => {
     let {data: todos, error} = await supabase
       .from('todos')
-      .select('*'); // Select all columns
+      .select('*') // Select all columns
+      .order('position', {ascending: true});
 
     if (error) {
       console.log(error); // Log the error if there is one
@@ -28,9 +29,11 @@ function App() {
 
   // Add a new todo to the 'todos' table in supabase
   const addTodo = async() => {
+    const maxPosition = await fetchMaxPosition(); // Fetch current position number of latest task added. This helps maintain order of list of tasks
+
     const {data, error} = await supabase
       .from('todos')
-      .insert([{title: newTodo, is_complete: false}]) // Insert into table with completion status defaulted to false
+      .insert([{title: newTodo, is_complete: false, position: maxPosition + 1}]) // Insert into table with completion status defaulted to false, and position number to the last + 1
       .select()
 
       if (error) {
@@ -42,6 +45,21 @@ function App() {
         // Clear the input field
         setNewtodo('');
       }
+  };
+
+  // Helper function to fetch the current maximum position
+  const fetchMaxPosition = async () => {
+    const { data: currentTodos, error } = await supabase
+      .from('todos')
+      .select('position')
+      .order('position', { ascending: true });
+
+    if (error) {
+      console.log('Error fetching current todos:', error);
+      return null;
+    }
+
+    return currentTodos.length ? Math.max(...currentTodos.map(todo => todo.position)) : 0;
   };
 
   // Update the todo being edited 
@@ -111,11 +129,12 @@ function App() {
       <button onClick={addTodo}>Add</button>
       <ul>
         {/* Get all todos from the state and list them */}
-        {todos.map(todo => (
+        {todos.map((todo, index) => (
           <li key={todo.id}>
             {/* If the todo is being edited, render as an input. Otherwise render as a view item */}
             {editId === todo.id ? (
               <>
+                {index + 1}.
                 <input
                   type="checkbox"
                   checked={todo.is_complete}
@@ -134,6 +153,7 @@ function App() {
               </>
             ) : (
               <>
+                {index + 1}.
                 <input
                   type="checkbox"
                   checked={todo.complete}
