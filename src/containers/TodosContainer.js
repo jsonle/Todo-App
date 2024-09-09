@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TodoInput from '../components/TodoInput';
 import TodoList from './TodoList';
 import ToggleSwitch from '../components/ToggleSwitch';
-import { Box, Container, Typography } from '@mui/material';
+import { Box, Container, Typography, Snackbar, Alert } from '@mui/material';
 import { supabase } from '../supabaseClient';
 
 const TodosContainer = () => {
@@ -11,6 +11,9 @@ const TodosContainer = () => {
   const [editId, setEditId] = useState(null); // State holding the ID of todo item being edited. Lets us make sure we're editing the correct item
   const [editTitle, setEditTitle] = useState(''); // State to hold title of todo being edited
   const [showCompleted, setShowCompleted] = useState(true); // State for wanting to show or hide completed tasks
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   // fetch todos whenever component is mounted
   useEffect(() => {
@@ -45,13 +48,19 @@ const TodosContainer = () => {
 
       if (error) {
         console.log('Error:', error);
+        setSnackbarMessage('Failed to add task');
+        setSnackbarSeverity('error');
       } else {
         // Update state with the new todo
         setTodos(prevTodos => [...prevTodos, ...data]);
     
         // Clear the input field
         setNewTodo('');
+
+        setSnackbarMessage('Task added successfully');
+        setSnackbarSeverity('success');
       }
+    setSnackbarOpen(true);
   };
 
   // Helper function to fetch the current maximum position
@@ -79,6 +88,8 @@ const TodosContainer = () => {
 
     if (error) {
       console.log(error);
+      setSnackbarMessage('Failed to save task');
+      setSnackbarSeverity('error');
     } else {
       setTodos(prevTodos =>
         prevTodos.map(todo =>
@@ -86,7 +97,10 @@ const TodosContainer = () => {
         )
       );
       setEditId(null); // Exit edit mode after saving
+      setSnackbarMessage('Task updated successfully');
+      setSnackbarSeverity('success');
     }
+    setSnackbarOpen(true);
   }
 
   // Handler for toggling whether a task is complete/incomplete
@@ -98,13 +112,18 @@ const TodosContainer = () => {
 
       if (error) {
         console.log(error); // Log the error if there is one
+        setSnackbarMessage('Failed to toggle task status');
+        setSnackbarSeverity('error');
       } else {
         setTodos(prevTodos => 
           prevTodos.map(todo => 
             todo.id === id ? {...todo, is_complete: !completeStatus} : todo
           )
         )
+        setSnackbarMessage('Task status updated successfully');
+        setSnackbarSeverity('success');
       }
+      setSnackbarOpen(true);
   }
 
   // Handler for toggling whether we want to show or hide completed tasks
@@ -122,10 +141,20 @@ const TodosContainer = () => {
     
     if (error) {
       console.log(error); // Log error if there is one
+      setSnackbarMessage('Failed to delete task');
+      setSnackbarSeverity('error');
     } else {
       setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id)); // Update current state to remove deleted todo
+      setSnackbarMessage('Task deleted successfully');
+      setSnackbarSeverity('success');
     }
+    setSnackbarOpen(true);
   }
+
+  // Handles closing SnackBar
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
     return (
         <Container maxWidth="sm">
@@ -146,6 +175,15 @@ const TodosContainer = () => {
             toggleComplete={toggleComplete}
           />
         </Box>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Container>
     );
 }
