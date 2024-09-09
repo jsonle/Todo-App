@@ -47,8 +47,7 @@ The app features a clean, user-friendly interface with a modern design. It uses 
 
 ## Screenshots
 
-### Desktop View
-![Desktop View](public/desktop.png)
-
-### Mobile View
-![Mobile View](public/mobile.png)
+<p align="center">
+  <img src="public/desktop.png" alt="Desktop View" width="45%" style="margin-right: 10px;" />
+  <img src="public/mobile.png" alt="Mobile View" width="45%" />
+</p>
