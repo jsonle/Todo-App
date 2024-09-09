@@ -2,15 +2,18 @@
 
 ## Summary
 
-The To-Do List App is a simple and intuitive task management application built with React, Material-UI, and supabase. It allows users to add, edit, and delete tasks, as well as mark tasks as complete or incomplete. The app features a clean and modern design, with functionality for toggling the visibility of completed tasks.
+The To-Do List App is a simple and intuitive task management application built with React, Material-UI, and supabase. It allows users to add, edit, and delete tasks, as well as mark tasks as complete or incomplete. The app also has functionality for toggling the visibility of completed tasks
 
 ## Table of Contents
-
+- [Demo](#demo)
 - [Setup](#setup)
 - [Technologies](#technologies)
 - [Design](#design)
 - [Components](#components)
 - [Resources](#resources)
+
+## Demo
+- Vercel: https://todo-app-phi-seven-91.vercel.app/
 
 ## Setup
 To run this project locally, install using npm:
@@ -24,8 +27,8 @@ $ npm start
 Project is created with:
 
 - React
-- Material-UI (MUI)
-- Supabase (for database management)
+- [Material-UI](https://mui.com/) (MUI)
+- [Supabase](https://supabase.com/) (for database management)
 
 ## Design
 
@@ -41,3 +44,11 @@ The app features a clean, user-friendly interface with a modern design. It uses 
 
 ## Resources
 - Favicon: https://www.favicon.cc/?action=icon&file_id=552373
+
+## Screenshots
+
+### Desktop View
+![Desktop View](public/desktop.png)
+
+### Mobile View
+![Mobile View](public/mobile.png)
